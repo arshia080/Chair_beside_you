@@ -14,7 +14,254 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      chat_messages: {
+        Row: {
+          created_at: string
+          id: string
+          parts: Json
+          role: string
+          thread_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          parts: Json
+          role: string
+          thread_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          parts?: Json
+          role?: string
+          thread_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "chat_messages_thread_id_fkey"
+            columns: ["thread_id"]
+            isOneToOne: false
+            referencedRelation: "chat_threads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      chat_threads: {
+        Row: {
+          created_at: string
+          id: string
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          title?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      confidence_plans: {
+        Row: {
+          context: string
+          created_at: string
+          id: string
+          mode: string
+          plan: string
+          user_id: string
+        }
+        Insert: {
+          context: string
+          created_at?: string
+          id?: string
+          mode: string
+          plan: string
+          user_id: string
+        }
+        Update: {
+          context?: string
+          created_at?: string
+          id?: string
+          mode?: string
+          plan?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      emotional_memories: {
+        Row: {
+          created_at: string
+          emotion: string | null
+          id: string
+          source: string | null
+          strength_note: string | null
+          summary: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          emotion?: string | null
+          id?: string
+          source?: string | null
+          strength_note?: string | null
+          summary: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          emotion?: string | null
+          id?: string
+          source?: string | null
+          strength_note?: string | null
+          summary?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      future_letters: {
+        Row: {
+          content: string
+          created_at: string
+          deliver_at: string
+          delivered: boolean
+          id: string
+          user_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          deliver_at: string
+          delivered?: boolean
+          id?: string
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          deliver_at?: string
+          delivered?: boolean
+          id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      garden_actions: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          kind: string
+          title: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          kind?: string
+          title: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          kind?: string
+          title?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      journal_entries: {
+        Row: {
+          ai_reflection: string | null
+          content: string
+          created_at: string
+          id: string
+          mood: string | null
+          user_id: string
+        }
+        Insert: {
+          ai_reflection?: string | null
+          content: string
+          created_at?: string
+          id?: string
+          mood?: string | null
+          user_id: string
+        }
+        Update: {
+          ai_reflection?: string | null
+          content?: string
+          created_at?: string
+          id?: string
+          mood?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          display_name: string | null
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          display_name?: string | null
+          id: string
+          updated_at?: string
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          display_name?: string | null
+          id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      victories: {
+        Row: {
+          created_at: string
+          id: string
+          image_url: string | null
+          note: string | null
+          title: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          note?: string | null
+          title: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          note?: string | null
+          title?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
