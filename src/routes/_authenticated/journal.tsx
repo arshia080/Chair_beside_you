@@ -4,6 +4,14 @@ import { useServerFn } from "@tanstack/react-start";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { addEntry, deleteEntry, listEntries } from "@/lib/journal.functions";
 
+type SRResult = { isFinal: boolean; 0: { transcript: string } };
+type SREvent = { resultIndex: number; results: ArrayLike<SRResult> };
+type SRInstance = {
+  continuous: boolean; interimResults: boolean; lang: string;
+  onresult: (e: SREvent) => void; onerror: () => void; onend: () => void;
+  start: () => void;
+};
+
 export const Route = createFileRoute("/_authenticated/journal")({
   component: JournalPage,
 });
@@ -30,13 +38,16 @@ function JournalPage() {
 
   const voiceJournal = () => {
     setVoiceErr(null);
-    const SR = (window as unknown as { webkitSpeechRecognition?: typeof window.SpeechRecognition; SpeechRecognition?: typeof window.SpeechRecognition }).SpeechRecognition
-            ?? (window as unknown as { webkitSpeechRecognition?: typeof window.SpeechRecognition }).webkitSpeechRecognition;
+    const w = window as unknown as {
+      SpeechRecognition?: new () => SRInstance;
+      webkitSpeechRecognition?: new () => SRInstance;
+    };
+    const SR = w.SpeechRecognition ?? w.webkitSpeechRecognition;
     if (!SR) { setVoiceErr("Your browser doesn't support voice journaling yet."); return; }
     const rec = new SR();
     rec.continuous = true; rec.interimResults = true; rec.lang = "en-US";
     setListening(true);
-    rec.onresult = (e: SpeechRecognitionEvent) => {
+    rec.onresult = (e: SREvent) => {
       let final = "";
       for (let i = e.resultIndex; i < e.results.length; i++) {
         if (e.results[i].isFinal) final += e.results[i][0].transcript + " ";
@@ -46,7 +57,6 @@ function JournalPage() {
     rec.onerror = () => setListening(false);
     rec.onend = () => setListening(false);
     rec.start();
-    (window as unknown as { _tcb_rec?: SpeechRecognition })._tcb_rec = rec;
   };
 
   return (

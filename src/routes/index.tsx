@@ -14,14 +14,15 @@ export const Route = createFileRoute("/")({
   component: Index,
 });
 
-const surfaces = [
+type Surface = { n: string; title: string; body: string; to: "/journal" | "/garden" | "/companion" | "/letters" | "/vault" | "/coach"; dark?: boolean };
+const surfaces: Surface[] = [
   { n: "01", title: "Tears Journal", body: "Release what you carry. The words that only flow when you're overwhelmed have a home here.", to: "/journal" },
   { n: "02", title: "Confidence Garden", body: "Plant small brave actions. Watch quiet resilience bloom over weeks, not days.", to: "/garden" },
   { n: "03", title: "AI Companion", body: "Not a coach. A witness. Someone to sit in the silence until the air feels lighter.", to: "/companion", dark: true },
   { n: "04", title: "Future Letters", body: "Speak to the version of you who hasn't arrived yet. We'll deliver it on the day you need it.", to: "/letters" },
   { n: "05", title: "Victory Vault", body: "The certificate, the kind text, the small win. Saved for the days you forget how far you've come.", to: "/vault" },
   { n: "06", title: "Confidence Coach", body: "Interviews, presentations, vivas, meetings. Personalized rituals for the moments that matter.", to: "/coach" },
-] as const;
+];
 
 function Index() {
   return (
@@ -59,7 +60,6 @@ function Index() {
 
         <section className="grid md:grid-cols-2 lg:grid-cols-3 gap-5 max-w-6xl w-full mt-40">
           {surfaces.map((s, i) => (
-            // @ts-expect-error typed router
             <Link key={s.n} to={s.to}
                   className={`group p-8 rounded-3xl transition-all duration-500 hover:-translate-y-1 animate-fade-up ${
                     s.dark ? "bg-ink text-canvas shadow-[var(--shadow-soft)]" : "glass hover:bg-card"

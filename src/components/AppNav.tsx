@@ -28,7 +28,6 @@ export function AppNav() {
       </Link>
       <div className="hidden lg:flex items-center gap-7 text-[10px] uppercase tracking-[0.2em] font-medium text-muted-foreground">
         {links.map((l) => (
-          // @ts-expect-error typed router
           <Link key={l.to} to={l.to} className="hover:text-ink transition-colors" activeProps={{ className: "text-ink" }}>
             {l.label}
           </Link>
