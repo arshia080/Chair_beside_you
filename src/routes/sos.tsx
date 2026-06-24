@@ -1,12 +1,12 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { AppNav } from "@/components/AppNav";
 
 export const Route = createFileRoute("/sos")({
   head: () => ({
     meta: [
       { title: "A hand to hold — SOS" },
-      { name: "description", content: "Grounding, breathing, and gentle words for the hardest moments." },
+      { name: "description", content: "Grounding, breathing, gentle words, and a small soothing game for the hardest moments." },
     ],
   }),
   component: SOSPage,
@@ -118,12 +118,123 @@ function SOSPage() {
           </div>
         </div>
 
+        <div className="mt-8 animate-fade-up" style={{ animationDelay: "300ms" }}>
+          <BubbleGarden />
+        </div>
+
         <div className="text-center mt-12">
           <Link to="/companion" className="text-sm italic font-serif text-muted-foreground hover:text-ink transition">
             ← When you're ready, the companion is here.
           </Link>
         </div>
       </main>
+    </div>
+  );
+}
+
+interface Bubble {
+  id: number;
+  left: number;
+  size: number;
+  duration: number;
+  delay: number;
+  hue: number;
+  popped: boolean;
+}
+
+function BubbleGarden() {
+  const [bubbles, setBubbles] = useState<Bubble[]>([]);
+  const [score, setScore] = useState(0);
+  const [active, setActive] = useState(false);
+
+  const spawn = useCallback(() => {
+    const id = Date.now() + Math.random();
+    setBubbles((prev) => {
+      if (prev.length >= 12) return prev;
+      return [
+        ...prev,
+        {
+          id,
+          left: 10 + Math.random() * 80,
+          size: 36 + Math.random() * 44,
+          duration: 8 + Math.random() * 8,
+          delay: Math.random() * 2,
+          hue: 180 + Math.random() * 60,
+          popped: false,
+        },
+      ];
+    });
+  }, []);
+
+  useEffect(() => {
+    if (!active) return;
+    spawn();
+    const id = setInterval(spawn, 1400);
+    return () => clearInterval(id);
+  }, [active, spawn]);
+
+  const pop = (id: number) => {
+    setBubbles((prev) => prev.map((b) => (b.id === id ? { ...b, popped: true } : b)));
+    setScore((s) => s + 1);
+    setTimeout(() => {
+      setBubbles((prev) => prev.filter((b) => b.id !== id));
+    }, 350);
+  };
+
+  return (
+    <div className="glass rounded-[2rem] p-8 md:p-12 text-center">
+      <div className="flex items-center justify-between mb-6">
+        <div className="text-left">
+          <p className="eyebrow">Bubble Garden</p>
+          <p className="text-sm text-muted-foreground">Pop the bubbles as they float by. There is no goal, only a soft moment.</p>
+        </div>
+        <div className="text-right">
+          <p className="text-sm text-muted-foreground">Bubbles released</p>
+          <p className="font-serif text-3xl italic">{score}</p>
+        </div>
+      </div>
+
+      <div className="relative h-64 rounded-2xl overflow-hidden bg-gradient-to-b from-sky-50/50 to-indigo-50/50 dark:from-sky-950/20 dark:to-indigo-950/20 border border-ink/5">
+        {!active ? (
+          <div className="absolute inset-0 flex items-center justify-center">
+            <button
+              onClick={() => setActive(true)}
+              className="px-6 py-3 rounded-full bg-ink text-canvas text-sm font-medium hover:bg-ink/90 transition"
+            >
+              Begin gently
+            </button>
+          </div>
+        ) : (
+          <>
+            {bubbles.map((b) => (
+              <button
+                key={b.id}
+                onClick={() => pop(b.id)}
+                className={`absolute rounded-full border border-white/40 shadow-sm backdrop-blur-sm transition-all duration-300 ${
+                  b.popped ? "scale-150 opacity-0" : "hover:scale-110"
+                }`}
+                style={{
+                  left: `${b.left}%`,
+                  bottom: "-20%",
+                  width: b.size,
+                  height: b.size,
+                  background: `radial-gradient(circle at 30% 30%, hsla(${b.hue}, 70%, 92%, 0.95), hsla(${b.hue}, 60%, 78%, 0.6))`,
+                  animation: `float ${b.duration}s linear ${b.delay}s forwards`,
+                }}
+                aria-label="Pop bubble"
+              />
+            ))}
+            <div className="absolute bottom-3 right-4">
+              <button
+                onClick={() => { setBubbles([]); setScore(0); setActive(false); }}
+                className="text-xs text-muted-foreground hover:text-ink transition"
+              >
+                Reset garden
+              </button>
+            </div>
+          </>
+        )}
+      </div>
     </div>
   );
 }
