@@ -73,15 +73,7 @@ function SOSPage() {
             </ul>
           </div>
 
-          <div className="bg-ink text-canvas rounded-3xl p-8">
-            <p className="eyebrow mb-4 text-canvas/60">If you need a human voice</p>
-            <ul className="space-y-3 text-sm">
-              <li><b className="font-serif text-lg italic">988</b> — US Suicide & Crisis Lifeline</li>
-              <li><b className="font-serif text-lg italic">116 123</b> — Samaritans (UK & ROI)</li>
-              <li><b className="font-serif text-lg italic">Text HOME to 741741</b> — Crisis Text Line</li>
-              <li className="text-canvas/60 text-xs pt-2">If you are in immediate danger, please call your local emergency number.</li>
-            </ul>
-          </div>
+          <LocalCrisisResources />
         </div>
 
         <div className="text-center mt-12">
