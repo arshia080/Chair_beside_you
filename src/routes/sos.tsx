@@ -72,7 +72,6 @@ function SOSPage() {
               <li><b className="font-serif italic">1</b> thing you can taste</li>
             </ul>
           </div>
-
           <LocalCrisisResources />
         </div>
 
@@ -82,7 +81,6 @@ function SOSPage() {
           </Link>
         </div>
       </main>
-        </div>
 
         <div className="text-center mt-12">
           <Link to="/companion" className="text-sm italic font-serif text-muted-foreground hover:text-ink transition">
