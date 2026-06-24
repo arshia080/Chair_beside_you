@@ -82,6 +82,131 @@ function SOSPage() {
           </Link>
         </div>
       </main>
+        </div>
+
+        <div className="text-center mt-12">
+          <Link to="/companion" className="text-sm italic font-serif text-muted-foreground hover:text-ink transition">
+            ← When you're ready, the companion is here.
+          </Link>
+        </div>
+      </main>
     </div>
+  );
+}
+
+type Hotline = { number: string; label: string };
+type Region = { country: string; hotlines: Hotline[]; emergency: string };
+
+const HOTLINES: Record<string, Region> = {
+  US: { country: "United States", emergency: "911", hotlines: [
+    { number: "988", label: "Suicide & Crisis Lifeline (call or text)" },
+    { number: "Text HOME to 741741", label: "Crisis Text Line" },
+    { number: "1-800-799-7233", label: "Domestic Violence Hotline" },
+  ]},
+  GB: { country: "United Kingdom", emergency: "999", hotlines: [
+    { number: "116 123", label: "Samaritans (24/7, free)" },
+    { number: "Text SHOUT to 85258", label: "Shout Crisis Text Line" },
+    { number: "0800 58 58 58", label: "CALM (5pm–midnight)" },
+  ]},
+  IE: { country: "Ireland", emergency: "112", hotlines: [
+    { number: "116 123", label: "Samaritans Ireland" },
+    { number: "Text HELLO to 50808", label: "Text About It" },
+  ]},
+  CA: { country: "Canada", emergency: "911", hotlines: [
+    { number: "988", label: "Suicide Crisis Helpline (call or text)" },
+    { number: "1-833-456-4566", label: "Talk Suicide Canada" },
+  ]},
+  AU: { country: "Australia", emergency: "000", hotlines: [
+    { number: "13 11 14", label: "Lifeline Australia" },
+    { number: "1300 659 467", label: "Suicide Call Back Service" },
+    { number: "Text 0477 13 11 14", label: "Lifeline Text" },
+  ]},
+  NZ: { country: "New Zealand", emergency: "111", hotlines: [
+    { number: "1737", label: "Need to Talk? (call or text)" },
+    { number: "0800 543 354", label: "Lifeline Aotearoa" },
+  ]},
+  IN: { country: "India", emergency: "112", hotlines: [
+    { number: "9152987821", label: "iCall (Mon–Sat, 8am–10pm)" },
+    { number: "1800-599-0019", label: "KIRAN Mental Health Helpline" },
+  ]},
+  DE: { country: "Germany", emergency: "112", hotlines: [
+    { number: "0800 111 0 111", label: "Telefonseelsorge (24/7, free)" },
+  ]},
+  FR: { country: "France", emergency: "112", hotlines: [
+    { number: "3114", label: "Numéro national de prévention du suicide" },
+    { number: "01 45 39 40 00", label: "SOS Amitié" },
+  ]},
+  ES: { country: "Spain", emergency: "112", hotlines: [
+    { number: "024", label: "Línea de atención a la conducta suicida" },
+  ]},
+  IT: { country: "Italy", emergency: "112", hotlines: [
+    { number: "800 86 00 22", label: "Telefono Amico" },
+  ]},
+  NL: { country: "Netherlands", emergency: "112", hotlines: [
+    { number: "113", label: "113 Zelfmoordpreventie" },
+  ]},
+  BR: { country: "Brazil", emergency: "192", hotlines: [
+    { number: "188", label: "CVV — Centro de Valorização da Vida" },
+  ]},
+  MX: { country: "Mexico", emergency: "911", hotlines: [
+    { number: "800 290 0024", label: "SAPTEL (24/7)" },
+  ]},
+  JP: { country: "Japan", emergency: "110", hotlines: [
+    { number: "0570-064-556", label: "Yorisoi Hotline" },
+  ]},
+  ZA: { country: "South Africa", emergency: "10111", hotlines: [
+    { number: "0800 567 567", label: "SADAG Suicide Crisis Line" },
+  ]},
+};
+
+const DEFAULT_REGION: Region = {
+  country: "Worldwide",
+  emergency: "your local emergency number",
+  hotlines: [
+    { number: "findahelpline.com", label: "Find a helpline in your country" },
+    { number: "befrienders.org", label: "Befrienders Worldwide directory" },
+  ],
+};
+
+function LocalCrisisResources() {
+  const [region, setRegion] = useState<Region | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await fetch("https://ipapi.co/json/");
+        const data = await res.json();
+        const code = (data?.country_code || data?.country || "").toUpperCase();
+        if (cancelled) return;
+        setRegion(HOTLINES[code] || DEFAULT_REGION);
+      } catch {
+        if (!cancelled) setRegion(DEFAULT_REGION);
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, []);
+
+  return (
+    <div className="bg-ink text-canvas rounded-3xl p-8">
+      <p className="eyebrow mb-4 text-canvas/60">
+        {loading ? "Finding support near you…" : `Support in ${region?.country ?? "your area"}`}
+      </p>
+      <ul className="space-y-3 text-sm">
+        {(region?.hotlines ?? []).map((h) => (
+          <li key={h.number}>
+            <b className="font-serif text-lg italic">{h.number}</b> — {h.label}
+          </li>
+        ))}
+        <li className="text-canvas/60 text-xs pt-2">
+          If you are in immediate danger, please call {region?.emergency ?? "your local emergency number"}.
+        </li>
+      </ul>
+    </div>
+  );
+}
   );
 }
