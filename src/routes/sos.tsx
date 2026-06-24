@@ -81,13 +81,6 @@ function SOSPage() {
           </Link>
         </div>
       </main>
-
-        <div className="text-center mt-12">
-          <Link to="/companion" className="text-sm italic font-serif text-muted-foreground hover:text-ink transition">
-            ← When you're ready, the companion is here.
-          </Link>
-        </div>
-      </main>
     </div>
   );
 }
