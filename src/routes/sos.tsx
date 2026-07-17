@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState } from "react";
 import { AppNav } from "@/components/AppNav";
+import { NeonDrift } from "@/components/neon-drift/NeonDrift";
 
 export const Route = createFileRoute("/sos")({
   head: () => ({
