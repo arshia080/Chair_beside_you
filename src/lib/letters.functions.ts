@@ -2,7 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { z } from "zod";
 import { generateText } from "ai";
-import { createLovableAiGatewayProvider } from "./ai-gateway.server";
+import { createAiProvider, AI_MODEL } from "./ai-gateway.server";
 import { checkRateLimit } from "./rate-limit.server";
 
 export const listLetters = createServerFn({ method: "GET" })
@@ -34,11 +34,11 @@ export const generateEncouragement = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     if (!checkRateLimit(`letters:${context.userId}`, 5)) throw new Error("Too many requests, take a breath and try again in a minute.");
 
-    const key = process.env.LOVABLE_API_KEY;
+    const key = process.env.GEMINI_API_KEY;
     if (!key) throw new Error("AI unavailable");
-    const gateway = createLovableAiGatewayProvider(key);
+    const gateway = createAiProvider(key);
     const { text } = await generateText({
-      model: gateway("google/gemini-3-flash-preview"),
+      model: gateway(AI_MODEL),
       system: "Write a short, tender letter (under 180 words) to the writer's future self. First person, written by their present self. Warm, specific, never preachy. No bullet points. Start with 'Dear future me,' on its own line.",
       prompt: `What I'm feeling now: ${data.feeling}`,
     });

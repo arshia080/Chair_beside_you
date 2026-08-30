@@ -278,8 +278,9 @@ export function QuietCrossword() {
       )}
 
       <div className="flex flex-col md:flex-row gap-6">
+        <div className="overflow-x-auto max-w-full shrink-0 -mx-1 px-1">
         <div
-          className="grid gap-[2px] bg-ink/10 p-[2px] rounded-lg select-none shrink-0"
+          className="grid gap-[2px] bg-ink/10 p-[2px] rounded-lg select-none w-fit"
           style={{ gridTemplateColumns: `repeat(${puzzle.cols}, 2rem)`, gridAutoRows: "2rem" }}
         >
           {puzzle.grid.map((row, r) =>
@@ -303,6 +304,7 @@ export function QuietCrossword() {
               );
             })
           )}
+        </div>
         </div>
 
         <div className="grid grid-cols-2 gap-4 text-sm flex-1">

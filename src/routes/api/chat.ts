@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { convertToModelMessages, streamText, generateText, type UIMessage } from "ai";
-import { createLovableAiGatewayProvider } from "@/lib/ai-gateway.server";
+import { createAiProvider, AI_MODEL } from "@/lib/ai-gateway.server";
 import { verifySupabaseUser } from "@/lib/verify-user.server";
 import { checkRateLimit } from "@/lib/rate-limit.server";
 
@@ -59,10 +59,10 @@ export const Route = createFileRoute("/api/chat")({
             ).join("\n")}`
           : "";
 
-        const key = process.env.LOVABLE_API_KEY;
-        if (!key) return new Response("Missing LOVABLE_API_KEY", { status: 500 });
-        const gateway = createLovableAiGatewayProvider(key);
-        const model = gateway("google/gemini-3-flash-preview");
+        const key = process.env.GEMINI_API_KEY;
+        if (!key) return new Response("Missing GEMINI_API_KEY", { status: 500 });
+        const gateway = createAiProvider(key);
+        const model = gateway(AI_MODEL);
 
         // Persist the latest user message
         const lastUser = [...body.messages].reverse().find(m => m.role === "user");

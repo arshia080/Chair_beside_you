@@ -2,7 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { z } from "zod";
 import { generateText } from "ai";
-import { createLovableAiGatewayProvider } from "./ai-gateway.server";
+import { createAiProvider, AI_MODEL } from "./ai-gateway.server";
 import { checkRateLimit } from "./rate-limit.server";
 
 export const listEntries = createServerFn({ method: "GET" })
@@ -22,13 +22,13 @@ export const addEntry = createServerFn({ method: "POST" })
     mood: z.string().max(40).optional(),
   }).parse(d))
   .handler(async ({ data, context }) => {
-    const key = process.env.LOVABLE_API_KEY;
+    const key = process.env.GEMINI_API_KEY;
     let reflection: string | null = null;
     if (key && checkRateLimit(`journal:${context.userId}`, 10)) {
       try {
-        const gateway = createLovableAiGatewayProvider(key);
+        const gateway = createAiProvider(key);
         const { text } = await generateText({
-          model: gateway("google/gemini-3-flash-preview"),
+          model: gateway(AI_MODEL),
           system: "You are a tender, emotionally attuned witness. In 2-3 short sentences, reflect what the writer might be feeling underneath their words. Be warm, never clinical. Do not advise. Do not start with 'I' or 'It sounds like'.",
           prompt: data.content,
         });
