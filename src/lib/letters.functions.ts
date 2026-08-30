@@ -3,6 +3,7 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { z } from "zod";
 import { generateText } from "ai";
 import { createLovableAiGatewayProvider } from "./ai-gateway.server";
+import { checkRateLimit } from "./rate-limit.server";
 
 export const listLetters = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
@@ -30,7 +31,9 @@ export const createLetter = createServerFn({ method: "POST" })
 export const generateEncouragement = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => z.object({ feeling: z.string().min(1).max(500) }).parse(d))
-  .handler(async ({ data }) => {
+  .handler(async ({ data, context }) => {
+    if (!checkRateLimit(`letters:${context.userId}`, 5)) throw new Error("Too many requests, take a breath and try again in a minute.");
+
     const key = process.env.LOVABLE_API_KEY;
     if (!key) throw new Error("AI unavailable");
     const gateway = createLovableAiGatewayProvider(key);

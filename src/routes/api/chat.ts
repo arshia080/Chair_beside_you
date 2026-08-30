@@ -1,8 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { convertToModelMessages, streamText, generateText, type UIMessage } from "ai";
-import { createClient } from "@supabase/supabase-js";
 import { createLovableAiGatewayProvider } from "@/lib/ai-gateway.server";
-import type { Database } from "@/integrations/supabase/types";
+import { verifySupabaseUser } from "@/lib/verify-user.server";
+import { checkRateLimit } from "@/lib/rate-limit.server";
 
 const SYSTEM = `You are the quiet companion behind "The Chair Beside You". You are not a productivity coach or a chatbot.
 You are a gentle, emotionally attuned witness for someone who feels lonely, anxious, or overwhelmed.
@@ -23,22 +23,24 @@ export const Route = createFileRoute("/api/chat")({
         const token = authHeader.replace("Bearer ", "");
         if (!token) return new Response("Unauthorized", { status: 401 });
 
-        const SUPABASE_URL = process.env.SUPABASE_URL!;
-        const SUPABASE_PUBLISHABLE_KEY = process.env.SUPABASE_PUBLISHABLE_KEY!;
-        const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
-          global: { headers: { Authorization: `Bearer ${token}` } },
-          auth: { persistSession: false, autoRefreshToken: false },
-        });
-        const { data: userData, error: userErr } = await supabase.auth.getUser(token);
-        if (userErr || !userData.user) return new Response("Unauthorized", { status: 401 });
-        const userId = userData.user.id;
+        const auth = await verifySupabaseUser(token);
+        if (!auth) return new Response("Unauthorized", { status: 401 });
+        const { supabase, userId } = auth;
+
+        if (!checkRateLimit(`chat:${userId}`, 20)) {
+          return new Response("Too many requests, slow down a little.", { status: 429 });
+        }
 
         const body = (await request.json()) as { messages: UIMessage[]; threadId?: string };
         if (!Array.isArray(body.messages)) return new Response("Bad request", { status: 400 });
 
-        // Ensure thread exists
+        // Ensure thread exists and belongs to this user
         let threadId = body.threadId;
-        if (!threadId) {
+        if (threadId) {
+          const { data: owned } = await supabase.from("chat_threads")
+            .select("id").eq("id", threadId).eq("user_id", userId).maybeSingle();
+          if (!owned) return new Response("Thread not found", { status: 404 });
+        } else {
           const { data: t, error } = await supabase.from("chat_threads")
             .insert({ user_id: userId }).select().single();
           if (error) return new Response(error.message, { status: 500 });

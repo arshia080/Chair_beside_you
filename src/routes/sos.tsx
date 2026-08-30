@@ -2,6 +2,14 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { AppNav } from "@/components/AppNav";
 import { NeonDrift } from "@/components/neon-drift/NeonDrift";
+import { QuietCrossword } from "@/components/calm-games/QuietCrossword";
+import { KartLoop } from "@/components/calm-games/KartLoop";
+
+const GAMES = [
+  { key: "crossword", label: "Quiet Crossword", hint: "A brand new grid every time you refresh the page.", render: () => <QuietCrossword /> },
+  { key: "kart", label: "Kart Loop", hint: "Drift a little kart around a track, boost with items. No opponents, nothing to lose.", render: () => <KartLoop /> },
+  { key: "drift", label: "Neon Drift", hint: "A soft arcade, if you want a little more to focus on.", render: () => <NeonDrift /> },
+] as const;
 
 export const Route = createFileRoute("/sos")({
   head: () => ({
@@ -30,6 +38,8 @@ function SOSPage() {
   const [phase, setPhase] = useState<"in" | "hold" | "out" | "rest">("in");
   const [count, setCount] = useState(4);
   const [quoteIndex, setQuoteIndex] = useState(0);
+  const [gameKey, setGameKey] = useState<(typeof GAMES)[number]["key"]>("crossword");
+  const game = GAMES.find((g) => g.key === gameKey)!;
 
   useEffect(() => {
     const seq: Array<{ p: typeof phase; t: number }> = [
@@ -120,7 +130,21 @@ function SOSPage() {
         </div>
 
         <div className="mt-8 animate-fade-up" style={{ animationDelay: "300ms" }}>
-          <NeonDrift />
+          <div className="flex flex-wrap items-center gap-2 mb-4">
+            {GAMES.map((g) => (
+              <button
+                key={g.key}
+                onClick={() => setGameKey(g.key)}
+                className={`px-4 py-2 rounded-full text-xs uppercase tracking-[0.15em] transition ${
+                  g.key === gameKey ? "bg-ink text-canvas" : "glass text-muted-foreground hover:text-ink"
+                }`}
+              >
+                {g.label}
+              </button>
+            ))}
+          </div>
+          <p className="text-sm text-muted-foreground mb-4">{game.hint}</p>
+          {game.render()}
         </div>
 
         <div className="text-center mt-12">

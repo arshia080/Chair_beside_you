@@ -3,6 +3,7 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { z } from "zod";
 import { generateText } from "ai";
 import { createLovableAiGatewayProvider } from "./ai-gateway.server";
+import { checkRateLimit } from "./rate-limit.server";
 
 export const listEntries = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
@@ -23,7 +24,7 @@ export const addEntry = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const key = process.env.LOVABLE_API_KEY;
     let reflection: string | null = null;
-    if (key) {
+    if (key && checkRateLimit(`journal:${context.userId}`, 10)) {
       try {
         const gateway = createLovableAiGatewayProvider(key);
         const { text } = await generateText({

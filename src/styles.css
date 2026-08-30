@@ -11,6 +11,7 @@
   --color-taupe: var(--taupe);
   --color-blush: var(--blush);
   --color-amber-soft: var(--amber-soft);
+  --color-powder: var(--powder);
 
   --color-background: var(--canvas);
   --color-foreground: var(--ink);
@@ -44,36 +45,47 @@
 }
 
 :root {
-  --canvas: #F9F7F2;
-  --ink: #2C2C2C;
-  --sage: #919A8C;
-  --taupe: #D8D2C2;
-  --blush: #E8D5C8;
-  --amber-soft: #F4E4C9;
+  --canvas: #FBF4FA;
+  --ink: #362A45;
+  --sage: #B48CD9;
+  --taupe: #D6E6F5;
+  --blush: #F6C9DE;
+  --amber-soft: #E8C7F0;
+  --powder: #C9DFF2;
   --card: rgba(255, 255, 255, 0.55);
-  --muted: rgba(44, 44, 44, 0.06);
-  --muted-foreground: rgba(44, 44, 44, 0.55);
-  --border: rgba(44, 44, 44, 0.08);
+  --muted: rgba(54, 42, 69, 0.06);
+  --muted-foreground: rgba(54, 42, 69, 0.55);
+  --border: rgba(54, 42, 69, 0.08);
+  --gradient-page: linear-gradient(135deg, #EDEAFB 0%, #F1E1FA 22%, #FBE3F1 46%, #E6F0FB 72%, #F1ECFA 100%);
 }
 
 .dark {
-  --canvas: #1A1814;
-  --ink: #F4EFE6;
-  --sage: #A8B0A2;
-  --taupe: #3A352D;
-  --blush: #4A3D35;
-  --amber-soft: #5C4830;
+  --canvas: #211829;
+  --ink: #F3E8F5;
+  --sage: #C9A6E8;
+  --taupe: #253A4A;
+  --blush: #4A2E42;
+  --amber-soft: #5A3A5C;
+  --powder: #2E4A5C;
   --card: rgba(255, 255, 255, 0.04);
-  --muted: rgba(244, 239, 230, 0.06);
-  --muted-foreground: rgba(244, 239, 230, 0.55);
-  --border: rgba(244, 239, 230, 0.08);
+  --muted: rgba(243, 232, 245, 0.06);
+  --muted-foreground: rgba(243, 232, 245, 0.55);
+  --border: rgba(243, 232, 245, 0.08);
+  --gradient-page: linear-gradient(135deg, #241A2E 0%, #2C1E38 30%, #33203A 55%, #1E2C38 80%, #211829 100%);
 }
 
 @layer base {
   * { border-color: var(--color-border); }
-  html, body { background-color: var(--canvas); color: var(--ink); }
+  html, body { background: var(--gradient-page); background-color: var(--canvas); color: var(--ink); }
   body { font-family: var(--font-sans); -webkit-font-smoothing: antialiased; }
   ::selection { background-color: color-mix(in oklab, var(--sage) 25%, transparent); }
+}
+
+/* Routes wrap their content in bg-canvas rather than styling <body> directly,
+   so the gradient has to ride along on that utility too or it never shows. */
+.bg-canvas {
+  background-color: var(--canvas);
+  background-image: var(--gradient-page);
 }
 
 @keyframes breathe {
